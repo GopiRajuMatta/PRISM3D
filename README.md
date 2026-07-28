@@ -28,11 +28,15 @@
 
 ## 📝 Abstract
 
+<div align="justify">
+
 We address the inverse problem of **blind 3D scene reconstruction from extremely motion-blurred images**, a scenario where traditional Structure-from-Motion pipelines fail. Unlike traditional methods that require sharp images for pose estimation, **PRISM3D** directly processes blurred images, making it practical for real-world scenarios.
 
 Our approach utilizes a **Robust Initialization strategy** via deep dense tracking (VGGSfM) to recover global topology where feature matching fails. To robustly populate these sparse priors, we adopt a probabilistic formulation for geometric densification via **Markov Chain Monte Carlo (MCMC)**, while simultaneously modeling physical image formation via continuous Bézier Trajectories.
 
 Furthermore, we introduce **PRISM3D-E**, a multi-modal (RGB + Events) extension that seamlessly integrates high-temporal-resolution events (EDI deblurring) as structural priors to maximize geometric recovery. To facilitate future research, we concurrently contribute the **PRISM3D-E Benchmark dataset** specifically curated for extreme blur scenarios.
+
+</div>
 
 ---
 
