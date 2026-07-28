@@ -3,7 +3,7 @@
 <div align="center">
 
 [![Project Page](https://img.shields.io/badge/Project-Page-green.svg)](https://gopirajumatta.github.io/PRISM3D/)
-[![Paper](https://img.shields.io/badge/Paper-ArXiv-red.svg)](#)
+[![Paper](https://img.shields.io/badge/Paper-ArXiv-red.svg)](https://arxiv.org/pdf/2607.03855v1)
 [![ECCV](https://img.shields.io/badge/ECCV-2026-blue.svg)](#)
 
 **[Gopi Raju Matta](https://www.linkedin.com/in/gopi-raju-matta-1b5347105)** · **[Trisha Reddypalli](https://www.linkedin.com/in/reddypalli-trisha)** · **[Divya Madhuri Vemunuri](https://www.linkedin.com/in/divya-madhuri-4641b7132)** · **[Kaushik Mitra](https://www.ee.iitm.ac.in/kmitra)**
@@ -14,14 +14,20 @@
 
 ---
 
-## 🚀 Teaser
+## 📰 News
+* **[July 2026]** Project page and GitHub repository launched!
+* **[July 2026]** Our pre-print is now available on [arXiv](https://arxiv.org/pdf/2607.03855v1).
+* **[July 2026]** PRISM3D has been accepted to **ECCV 2026**!
 
-<div align="center">
-  <video src="https://gopirajumatta.github.io/PRISM3D/static/videos/camellia.mp4" autoplay muted loop playsinline width="80%"></video>
-</div>
-<br>
+---
+
+## 🚀 Teaser: The PRISM3D Pipeline
+
 <p align="center">
-  <em>PRISM3D framework learns a sharp 3D Gaussian representation of the scene along with its camera motion trajectories directly from extreme motion-blurred images, enabling state-of-the-art deblurring, high-quality novel view synthesis, and real-time rendering.</em>
+  <img src="https://gopirajumatta.github.io/PRISM3D/static/images/pipeline.png" alt="PRISM3D Pipeline Overview" width="100%">
+</p>
+<p align="center">
+  <em><strong>Overview of PRISM3D and PRISM3D-E.</strong> Our framework jointly estimates camera motion and a sharp Gaussian representation directly from severely motion-blurred images, utilizing deep SfM for robust initialization and MCMC for probabilistic geometric refinement.</em>
 </p>
 
 ---
@@ -37,17 +43,6 @@ Our approach utilizes a **Robust Initialization strategy** via deep dense tracki
 Furthermore, we introduce **PRISM3D-E**, a multi-modal (RGB + Events) extension that seamlessly integrates high-temporal-resolution events (EDI deblurring) as structural priors to maximize geometric recovery. To facilitate future research, we concurrently contribute the **PRISM3D-E Benchmark dataset** specifically curated for extreme blur scenarios.
 
 </div>
-
----
-
-## ⚙️ Method: The PRISM3D Pipeline
-
-<p align="center">
-  <img src="https://gopirajumatta.github.io/PRISM3D/static/images/pipeline.png" alt="PRISM3D Pipeline Overview" width="100%">
-</p>
-<p align="center">
-  <em><strong>Overview of PRISM3D and PRISM3D-E.</strong> Our framework jointly estimates camera motion and a sharp Gaussian representation directly from severely motion-blurred images, utilizing deep SfM for robust initialization and MCMC for probabilistic geometric refinement.</em>
-</p>
 
 ---
 
