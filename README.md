@@ -17,7 +17,7 @@
 ## 📰 News
 * **[July 2026]** Project page and GitHub repository launched!
 * **[July 2026]** Our pre-print is now available on [arXiv](https://arxiv.org/pdf/2607.03855v1).
-* **[July 2026]** PRISM3D has been accepted to **ECCV 2026**!
+* **[June 2026]** PRISM3D has been accepted to **ECCV 2026**!
 
 ---
 
@@ -50,11 +50,10 @@ Furthermore, we introduce **PRISM3D-E**, a multi-modal (RGB + Events) extension 
 
 We are currently preparing the codebase and datasets for public release. 
 
-- [x] Project Page & Teaser Released
+- [x] Project Page Released
 - [x] ArXiv Pre-print Available
 - [ ] **Coming Soon:** Full Source Code (Training & Evaluation)
 - [ ] **Coming Soon:** PRISM3D-E Benchmark Dataset
-- [ ] **Coming Soon:** Pre-trained Models
 
 *Star ⭐ this repository to get notified when the code drops!*
 
