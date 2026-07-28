@@ -1,4 +1,4 @@
-# PRISM3D: Probabilistic Refinement and Robust Initialization for Physically Consistent Scene Modeling under Extreme Motion Blur
+<h1 align="center">PRISM3D: Probabilistic Refinement and Robust Initialization for Physically Consistent Scene Modeling under Extreme Motion Blur</h1>
 
 <div align="center">
 
