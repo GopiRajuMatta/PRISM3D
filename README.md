@@ -97,7 +97,7 @@ Each scene lives in its own folder (`data/<dataset>/<scene>/`) in COLMAP format:
 - Synthetic: [ExBluRF dataset](https://drive.google.com/drive/folders/1kd061Ip9l9RUrze_6MOPAiz-Mcw_bwux?usp=drive_link)
 - Real: [E2NeRF dataset](https://drive.google.com/drive/folders/1XhOEp4UdLL7EnDNyWdxxX8aRvzF53fWo?usp=sharing)
 
-**PRISM3D-E** (RGB+Events) reuses the *same* RGB images from ExBlur-f/E2NeRF, but pairs them with our own
+**PRISM3D-E** (RGB+Events) reuses the *same* RGB images from ExBluRF/E2NeRF, but pairs them with our own
 VGGSfM-based `sparse/0/` and per-scene `hold=<n>`, since these differ from what ships with the original datasets —
 plus new `events_bins_13.pt` event tensors for the synthetic scenes. To avoid redistributing data we don't own, we
 release only this complementary layer as the **PRISM3D-E Benchmark dataset**:
