@@ -117,7 +117,6 @@ To set up a scene: download the original ExBlur-f (synthetic) / E2NeRF (real) im
 `sparse/0/`, `hold=<n>`, and (for synthetic) `events_bins_13.pt` into the same per-scene folder, alongside the
 original `images/`.
 
-`--scale_factor 0.25` is recommended for forward-facing/LLFF-style captures; use `1.0` for object-centric scenes.
 
 ### 3. Training
 
