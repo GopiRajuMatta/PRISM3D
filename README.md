@@ -91,7 +91,7 @@ Each scene lives in its own folder (`data/<dataset>/<scene>/`) in COLMAP format:
 - **`hold=<n>`** is read directly from the scene folder at load time (see `datasets/deblur_nerf.py`), so each scene
   can use a different eval interval `n` rather than one fixed value for the whole dataset.
 - **`events_bins_<k>.pt`** holds `k` event bins per consecutive blurry-frame transition; `k` must match
-  `camera_optimizer.num_virtual_views - 1` for whichever events trainer script you use.
+  `camera_optimizer.num_virtual_views - 1`.
 
 **PRISM3D** (RGB-only) uses the existing public datasets directly, no complementary files needed:
 - Synthetic: [ExBluRF dataset](https://drive.google.com/drive/folders/1kd061Ip9l9RUrze_6MOPAiz-Mcw_bwux?usp=drive_link)
@@ -125,21 +125,15 @@ Training entrypoints follow the `gsplat` examples pattern: `python <script>.py <
 `default` uses the original 3DGS densification heuristics and `mcmc` uses the MCMC-based (probabilistic geometric
 refinement) densification strategy described in the paper.
 
-**PRISM3D** and **PRISM3D-E** use the same training code — the only difference is which dataset you point at:
-
-- `train.sh` → `simple_trainer_deblur.py`: RGB-only, for VGGSfM-initialized ExBlur-f/E2NeRF scenes (**PRISM3D**).
-- `train_events.sh` → `simple_trainer_deblur_events_all.py`: same pipeline plus the event loss (`event_loss_helpers.py`),
-  for scenes that also have an `events_bins_<k>.pt` file (**PRISM3D-E**).
-
-Both trains each scene in `SCENE_LIST`, then evaluates + renders every saved checkpoint, then prints the
-deblurring/NVS/train stats for all scenes:
+**PRISM3D** and **PRISM3D-E** use the same training code (`simple_trainer_deblur.py`) — the only difference is which
+dataset you point at. `train.sh` trains each scene in `SCENE_LIST`, then evaluates + renders every saved checkpoint,
+then prints the deblurring/NVS/train stats for all scenes:
 
 ```bash
-bash train.sh          # PRISM3D
-bash train_events.sh   # PRISM3D-E
+bash train.sh
 ```
 
-Edit `SCENE_DIR` / `RESULT_DIR` / `SCENE_LIST` / `CAP_MAX` at the top of either script for your data layout and scenes.
+Edit `SCENE_DIR` / `RESULT_DIR` / `SCENE_LIST` / `CAP_MAX` at the top of the script for your data layout and scenes.
 
 Key flags:
 - `--camera-optimizer.mode {off,linear,cubic,bezier}`: trajectory model for the bundle-adjusted camera optimizer
@@ -161,17 +155,6 @@ Each run writes to `--result_dir`:
 
 - `simple_viewer.py` — standalone gsplat viewer for a trained checkpoint.
 - `pose_viewer.py` — visualize optimized camera trajectories/poses.
-
----
-
-## 📅 Release Roadmap
-
-- [x] Project Page Released
-- [x] ArXiv Pre-print Available
-- [x] PRISM3D / PRISM3D-E Training & Evaluation Code
-- [x] PRISM3D-E Benchmark Dataset Released
-
-*Star ⭐ this repository to get notified of updates!*
 
 ---
 
@@ -201,47 +184,6 @@ This project builds directly on BAD-Gaussians; if you use this code, please also
 
 ## Acknowledgments
 
-- Kudos to the [Nerfstudio](https://github.com/nerfstudio-project/) and [gsplat](https://github.com/nerfstudio-project/gsplat) contributors for their amazing works:
-
-    ```bibtex
-    @inproceedings{nerfstudio,
-        title        = {Nerfstudio: A Modular Framework for Neural Radiance Field Development},
-        author       = {
-            Tancik, Matthew and Weber, Ethan and Ng, Evonne and Li, Ruilong and Yi, Brent
-            and Kerr, Justin and Wang, Terrance and Kristoffersen, Alexander and Austin,
-            Jake and Salahi, Kamyar and Ahuja, Abhik and McAllister, David and Kanazawa,
-            Angjoo
-        },
-        year         = 2023,
-        booktitle    = {ACM SIGGRAPH 2023 Conference Proceedings},
-        series       = {SIGGRAPH '23}
-    }
-
-    @software{Ye_gsplat,
-        author  = {Ye, Vickie and Turkulainen, Matias, and the Nerfstudio team},
-        title   = {{gsplat}},
-        url     = {https://github.com/nerfstudio-project/gsplat}
-    }
-
-    @misc{ye2023mathematical,
-        title={Mathematical Supplement for the $\texttt{gsplat}$ Library}, 
-        author={Vickie Ye and Angjoo Kanazawa},
-        year={2023},
-        eprint={2312.02121},
-        archivePrefix={arXiv},
-        primaryClass={cs.MS}
-    }
-    ```
-
-- Kudos to the [pypose](https://github.com/pypose/pypose) contributors for their amazing library:
-
-    ```bibtex
-    @inproceedings{wang2023pypose,
-    title = {{PyPose}: A Library for Robot Learning with Physics-based Optimization},
-    author = {Wang, Chen and Gao, Dasong and Xu, Kuan and Geng, Junyi and Hu, Yaoyu and Qiu, Yuheng and Li, Bowen and Yang, Fan and Moon, Brady and Pandey, Abhinav and Aryan and Xu, Jiahe and Wu, Tianhao and He, Haonan and Huang, Daning and Ren, Zhongqiang and Zhao, Shibo and Fu, Taimeng and Reddy, Pranay and Lin, Xiao and Wang, Wenshan and Shi, Jingnan and Talak, Rajat and Cao, Kun and Du, Yi and Wang, Han and Yu, Huai and Wang, Shanzhao and Chen, Siyu and Kashyap, Ananth  and Bandaru, Rohan and Dantu, Karthik and Wu, Jiajun and Xie, Lihua and Carlone, Luca and Hutter, Marco and Scherer, Sebastian},
-    booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
-    year = {2023}
-    }
-    ```
-
-- Built upon [BAD-Gaussians](https://github.com/WU-CVGL/BAD-Gaussians) (Zhao et al., ECCV 2024) — see Citation above.
+- Thanks to the **VGGSfM** authors for their deep dense-tracking SfM, which we use for robust initialization from severely blurred images.
+- Thanks to the **ExBluRF** authors for their synthetic motion-blur dataset.
+- Thanks to the [BAD-Gaussians](https://github.com/WU-CVGL/BAD-Gaussians) authors — this codebase builds on their bundle-adjusted deblur Gaussian splatting formulation (see Citation above).
