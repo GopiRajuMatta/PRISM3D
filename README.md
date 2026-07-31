@@ -118,7 +118,7 @@ To set up a scene: download the original ExBluRF (synthetic) / E2NeRF (real) ima
 original `images/`.
 
 
-### 3. Training
+### 3. Training & Evaluation
 
 Training entrypoints follow the `gsplat` examples pattern: `python <script>.py <default|mcmc> [options]`, where
 `default` uses the original 3DGS densification heuristics and `mcmc` uses the MCMC-based (probabilistic geometric
