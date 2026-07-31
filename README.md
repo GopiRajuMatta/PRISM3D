@@ -183,6 +183,6 @@ This project builds directly on BAD-Gaussians; if you use this code, please also
 
 ## Acknowledgments
 
-- Thanks to the **VGGSfM** authors for their deep dense-tracking SfM, which we use for robust initialization from severely blurred images.
-- Thanks to the **ExBluRF** authors for their synthetic motion-blur dataset.
-- Thanks to the [BAD-Gaussians](https://github.com/WU-CVGL/BAD-Gaussians) authors — this codebase builds on their bundle-adjusted deblur Gaussian splatting formulation (see Citation above).
+- Thanks to the [VGGSfM](https://github.com/facebookresearch/vggsfm) authors for their deep dense-tracking SfM, which we use for robust initialization from severely blurred images.
+- Thanks to the [ExBluRF](https://github.com/taekkii/exblurf) authors for their real extreme motion-blur dataset.
+- Thanks to the [BAD-Gaussians](https://github.com/WU-CVGL/BAD-Gaussians) authors — this codebase builds on their bundle-adjusted deblur Gaussian splatting formulation.
