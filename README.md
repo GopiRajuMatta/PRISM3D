@@ -46,16 +46,132 @@ Furthermore, we introduce **PRISM3D-E**, a multi-modal (RGB + Events) extension 
 
 ---
 
-## 📅 Release Roadmap
+## Quickstart
 
-We are currently preparing the codebase and datasets for public release. 
+### 1. Installation
+
+This repo assumes PyTorch (with CUDA) is already installed. Then install the remaining dependencies:
+
+```bash
+# (Optional) create a fresh conda env
+conda create --name prism3d -y "python<3.11"
+conda activate prism3d
+
+# install dependencies
+pip install --upgrade pip setuptools
+pip install -r requirements.txt
+```
+
+`requirements.txt` pulls in `gsplat` and `fused-ssim` directly from their git repos (pinned commits), along with
+`viser`/`nerfview` for the interactive viewer, `tyro` for CLI configs, and `pypose` for pose/spline optimization.
+
+Then install this repo's own package (camera optimizer, spline utilities, MCMC strategy) in editable mode:
+
+```bash
+pip install -e .
+```
+
+### 2. Prepare the dataset
+
+Each scene lives in its own folder (`data/<dataset>/<scene>/`) in COLMAP format:
+
+```
+<scene>/
+├── images/            # training images (blurry), full resolution
+├── images_<factor>/    # optional pre-downsampled variant, e.g. images_2/ for --data_factor 2
+├── images_test/        # held-out GT sharp images (deblurring + novel-view-synthesis eval)
+├── images_test_<factor>/
+├── sparse/0/           # COLMAP-format sparse reconstruction: cameras.bin, images.bin, points3D.bin
+├── hold=<n>             # empty marker file — sets this scene's eval interval (see below)
+└── events_bins_<k>.pt   # PRISM3D-E only: event tensor, shape [num_frames, k, H, W]
+```
+
+- **`sparse/0/`** is generated with **VGGSfM** (deep dense tracking), not classic COLMAP feature matching — this is
+  what lets PRISM3D initialize from severely blurred images where feature matching fails.
+- **`hold=<n>`** is read directly from the scene folder at load time (see `datasets/deblur_nerf.py`), so each scene
+  can use a different eval interval `n` rather than one fixed value for the whole dataset.
+- **`events_bins_<k>.pt`** holds `k` event bins per consecutive blurry-frame transition; `k` must match
+  `camera_optimizer.num_virtual_views - 1` for whichever events trainer script you use.
+
+**PRISM3D** (RGB-only) uses the existing public datasets directly, no complementary files needed:
+- Synthetic: [ExBluRF dataset](https://drive.google.com/drive/folders/1kd061Ip9l9RUrze_6MOPAiz-Mcw_bwux?usp=drive_link)
+- Real: [E2NeRF dataset](https://drive.google.com/drive/folders/1XhOEp4UdLL7EnDNyWdxxX8aRvzF53fWo?usp=sharing)
+
+**PRISM3D-E** (RGB+Events) reuses the *same* RGB images from ExBlur-f/E2NeRF, but pairs them with our own
+VGGSfM-based `sparse/0/` and per-scene `hold=<n>`, since these differ from what ships with the original datasets —
+plus new `events_bins_13.pt` event tensors for the synthetic scenes. To avoid redistributing data we don't own, we
+release only this complementary layer as the **PRISM3D-E Benchmark dataset**:
+
+📦 **[Download PRISM3D-E Benchmark (Google Drive)](https://drive.google.com/drive/folders/1xzMbtLh5cck_C9et-MGIcoNsL2MoWofY?usp=sharing)**
+
+```
+PRISM3D-E/
+├── synthetic/<scene>/   # sparse/0/, hold=<n>, events_bins_13.pt   (8 scenes)
+└── real/<scene>/        # sparse/0/, hold=<n>                      (5 scenes)
+```
+
+Note: **real** scenes ship without event tensors here — E2NeRF's own release already provides the corresponding
+real-world event data, so use that alongside this archive's `sparse/0/` and `hold=<n>`.
+
+To set up a scene: download the original ExBlur-f (synthetic) / E2NeRF (real) images, then copy this archive's
+`sparse/0/`, `hold=<n>`, and (for synthetic) `events_bins_13.pt` into the same per-scene folder, alongside the
+original `images/`.
+
+`--scale_factor 0.25` is recommended for forward-facing/LLFF-style captures; use `1.0` for object-centric scenes.
+
+### 3. Training
+
+Training entrypoints follow the `gsplat` examples pattern: `python <script>.py <default|mcmc> [options]`, where
+`default` uses the original 3DGS densification heuristics and `mcmc` uses the MCMC-based (probabilistic geometric
+refinement) densification strategy described in the paper.
+
+**PRISM3D** and **PRISM3D-E** use the same training code — the only difference is which dataset you point at:
+
+- `train.sh` → `simple_trainer_deblur.py`: RGB-only, for VGGSfM-initialized ExBlur-f/E2NeRF scenes (**PRISM3D**).
+- `train_events.sh` → `simple_trainer_deblur_events_all.py`: same pipeline plus the event loss (`event_loss_helpers.py`),
+  for scenes that also have an `events_bins_<k>.pt` file (**PRISM3D-E**).
+
+Both trains each scene in `SCENE_LIST`, then evaluates + renders every saved checkpoint, then prints the
+deblurring/NVS/train stats for all scenes:
+
+```bash
+bash train.sh          # PRISM3D
+bash train_events.sh   # PRISM3D-E
+```
+
+Edit `SCENE_DIR` / `RESULT_DIR` / `SCENE_LIST` / `CAP_MAX` at the top of either script for your data layout and scenes.
+
+Key flags:
+- `--camera-optimizer.mode {off,linear,cubic,bezier}`: trajectory model for the bundle-adjusted camera optimizer
+  (`bezier` is the continuous Bézier trajectory model described in the paper).
+- `--strategy.cap-max`: max Gaussian count for the MCMC strategy (`mcmc` subcommand only).
+- `--data_factor` / `--scale_factor`: image downscale factor and camera-origin scale (see dataset prep above).
+- `--disable_viewer`: disable the interactive `viser`/`nerfview` viewer (recommended for batch/headless runs).
+
+### 4. Outputs
+
+Each run writes to `--result_dir`:
+- `ckpts/` — model checkpoints (`ckpt_<step>_rank<r>.pt`)
+- `stats/` — per-step JSON metrics (`train*`, `deblur*`, `nvs*`)
+- `renders/` — rendered images/trajectories
+- `tb/` — TensorBoard logs
+- `cfg.yml` — the resolved run config
+
+### 5. Viewer / pose inspection
+
+- `simple_viewer.py` — standalone gsplat viewer for a trained checkpoint.
+- `pose_viewer.py` — visualize optimized camera trajectories/poses.
+
+---
+
+## 📅 Release Roadmap
 
 - [x] Project Page Released
 - [x] ArXiv Pre-print Available
-- [ ] **Coming Soon:** Full Source Code (Training & Evaluation)
-- [ ] **Coming Soon:** PRISM3D-E Benchmark Dataset
+- [x] PRISM3D / PRISM3D-E Training & Evaluation Code
+- [x] PRISM3D-E Benchmark Dataset Released
 
-*Star ⭐ this repository to get notified when the code drops!*
+*Star ⭐ this repository to get notified of updates!*
 
 ---
 
@@ -70,3 +186,62 @@ If you find our work useful in your research, please consider citing:
   booktitle = {European Conference on Computer Vision (ECCV)},
   year      = {2026}
 }
+```
+
+This project builds directly on BAD-Gaussians; if you use this code, please also cite:
+
+```bibtex
+@inproceedings{zhao2024badgaussians,
+    author = {Zhao, Lingzhe and Wang, Peng and Liu, Peidong},
+    title = {Bad-gaussians: Bundle adjusted deblur gaussian splatting},
+    booktitle = {European Conference on Computer Vision (ECCV)},
+    year = {2024}
+}
+```
+
+## Acknowledgments
+
+- Kudos to the [Nerfstudio](https://github.com/nerfstudio-project/) and [gsplat](https://github.com/nerfstudio-project/gsplat) contributors for their amazing works:
+
+    ```bibtex
+    @inproceedings{nerfstudio,
+        title        = {Nerfstudio: A Modular Framework for Neural Radiance Field Development},
+        author       = {
+            Tancik, Matthew and Weber, Ethan and Ng, Evonne and Li, Ruilong and Yi, Brent
+            and Kerr, Justin and Wang, Terrance and Kristoffersen, Alexander and Austin,
+            Jake and Salahi, Kamyar and Ahuja, Abhik and McAllister, David and Kanazawa,
+            Angjoo
+        },
+        year         = 2023,
+        booktitle    = {ACM SIGGRAPH 2023 Conference Proceedings},
+        series       = {SIGGRAPH '23}
+    }
+
+    @software{Ye_gsplat,
+        author  = {Ye, Vickie and Turkulainen, Matias, and the Nerfstudio team},
+        title   = {{gsplat}},
+        url     = {https://github.com/nerfstudio-project/gsplat}
+    }
+
+    @misc{ye2023mathematical,
+        title={Mathematical Supplement for the $\texttt{gsplat}$ Library}, 
+        author={Vickie Ye and Angjoo Kanazawa},
+        year={2023},
+        eprint={2312.02121},
+        archivePrefix={arXiv},
+        primaryClass={cs.MS}
+    }
+    ```
+
+- Kudos to the [pypose](https://github.com/pypose/pypose) contributors for their amazing library:
+
+    ```bibtex
+    @inproceedings{wang2023pypose,
+    title = {{PyPose}: A Library for Robot Learning with Physics-based Optimization},
+    author = {Wang, Chen and Gao, Dasong and Xu, Kuan and Geng, Junyi and Hu, Yaoyu and Qiu, Yuheng and Li, Bowen and Yang, Fan and Moon, Brady and Pandey, Abhinav and Aryan and Xu, Jiahe and Wu, Tianhao and He, Haonan and Huang, Daning and Ren, Zhongqiang and Zhao, Shibo and Fu, Taimeng and Reddy, Pranay and Lin, Xiao and Wang, Wenshan and Shi, Jingnan and Talak, Rajat and Cao, Kun and Du, Yi and Wang, Han and Yu, Huai and Wang, Shanzhao and Chen, Siyu and Kashyap, Ananth  and Bandaru, Rohan and Dantu, Karthik and Wu, Jiajun and Xie, Lihua and Carlone, Luca and Hutter, Marco and Scherer, Sebastian},
+    booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+    year = {2023}
+    }
+    ```
+
+- Built upon [BAD-Gaussians](https://github.com/WU-CVGL/BAD-Gaussians) (Zhao et al., ECCV 2024) — see Citation above.
