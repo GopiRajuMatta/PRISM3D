@@ -1,5 +1,5 @@
 SCENE_DIR="data/vggsfm_007/with_edi_exblurnerf"
-RESULT_DIR="results_events"
+RESULT_DIR="results"
 SCENE_LIST="bench camellia dragon jars jars2 postbox stone_lantern sunflowers"
 CAP_MAX=500000
 
@@ -13,7 +13,7 @@ do
     echo "Running $SCENE"
 
     # train without eval
-    CUDA_VISIBLE_DEVICES=$GPUS python prism3d_e_trainer.py mcmc \
+    CUDA_VISIBLE_DEVICES=$GPUS python prism3d_trainer.py mcmc \
         --eval_steps -1 \
         --disable_viewer \
         --data_factor $DATA_FACTOR \
@@ -26,7 +26,7 @@ do
     # run eval and render
     for CKPT in $RESULT_DIR/$SCENE/ckpts/*;
     do
-        CUDA_VISIBLE_DEVICES=$GPUS python prism3d_e_trainer.py mcmc \
+        CUDA_VISIBLE_DEVICES=$GPUS python prism3d_trainer.py mcmc \
             --disable_viewer \
             --data_factor $DATA_FACTOR \
             --camera-optimizer.mode $TRAJ_TYPE \
@@ -45,27 +45,27 @@ do
     echo "=== Deblur Eval Stats ==="
 
     for STATS in $RESULT_DIR/$SCENE/stats/deblur*.json;
-    do  
+    do
         echo $STATS
-        cat $STATS; 
+        cat $STATS;
         echo
     done
 
     echo "=== NVS Eval Stats ==="
 
     for STATS in $RESULT_DIR/$SCENE/stats/nvs*.json;
-    do  
+    do
         echo $STATS
-        cat $STATS; 
+        cat $STATS;
         echo
     done
 
     echo "=== Train Stats ==="
 
     for STATS in $RESULT_DIR/$SCENE/stats/train*_rank0.json;
-    do  
+    do
         echo $STATS
-        cat $STATS; 
+        cat $STATS;
         echo
     done
 done

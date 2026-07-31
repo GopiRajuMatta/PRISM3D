@@ -124,7 +124,7 @@ Training entrypoints follow the `gsplat` examples pattern: `python <script>.py <
 `default` uses the original 3DGS densification heuristics and `mcmc` uses the MCMC-based (probabilistic geometric
 refinement) densification strategy described in the paper.
 
-**PRISM3D** and **PRISM3D-E** use the same training code (`simple_trainer_deblur.py`) — the only difference is which
+**PRISM3D** and **PRISM3D-E** use the same training code (`prism3d_trainer.py`) — the only difference is which
 dataset you point at. `train.sh` trains each scene in `SCENE_LIST`, then evaluates + renders every saved checkpoint,
 then prints the deblurring/NVS/train stats for all scenes:
 
