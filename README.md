@@ -113,7 +113,7 @@ PRISM3D-E/
 Note: **real** scenes ship without event tensors here — E2NeRF's own release already provides the corresponding
 real-world event data, so use that alongside this archive's `sparse/0/` and `hold=<n>`.
 
-To set up a scene: download the original ExBlur-f (synthetic) / E2NeRF (real) images, then copy this archive's
+To set up a scene: download the original ExBluRF (synthetic) / E2NeRF (real) images, then copy this archive's
 `sparse/0/`, `hold=<n>`, and (for synthetic) `events_bins_13.pt` into the same per-scene folder, alongside the
 original `images/`.
 
