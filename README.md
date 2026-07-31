@@ -102,7 +102,7 @@ VGGSfM-based `sparse/0/` and per-scene `hold=<n>`, since these differ from what 
 plus new `events_bins_13.pt` event tensors for the synthetic scenes. To avoid redistributing data we don't own, we
 release only this complementary layer as the **PRISM3D-E Benchmark dataset**:
 
-📦 **[Download PRISM3D-E Benchmark (Google Drive)](https://drive.google.com/drive/folders/1xzMbtLh5cck_C9et-MGIcoNsL2MoWofY?usp=sharing)**
+📦 **[Download PRISM3D-E Benchmark](https://drive.google.com/drive/folders/1xzMbtLh5cck_C9et-MGIcoNsL2MoWofY?usp=sharing)**
 
 ```
 PRISM3D-E/
